@@ -76,3 +76,53 @@ grep -i '\.jpg$' /path/to/inference/inference_images.txt \
 
 If you use the filtered list, specify `jpg_images.txt` instead of `inference_images.txt` when running inference.
 
+## Generate run pipe
+
+Run these from `${TRAINING_DIR}` (the directory that contains `category_models/`).
+
+1. Copy the pipeline template out of the container:
+
+```bash
+cd ${TRAINING_DIR}
+apptainer exec ${VIAME_CONTAINER} \
+    cat /opt/noaa/viame/configs/pipelines/templates/detector_default.pipe \
+    > category_models/detector_default.pipe
+```
+
+2. Extract the detector block (everything after `:: image_object_detector` up to the first `connect`):
+
+```bash
+awk '/:: image_object_detector/{f=1;next} /^connect/{f=0} f' \
+    category_models/detector.pipe > category_models/detector_block.txt
+```
+
+3. Insert the block in place of the `[-DETECTOR-IMPL-]` placeholder:
+
+```bash
+sed -e '/\[-DETECTOR-IMPL-\]/{r category_models/detector_block.txt' -e 'd}' \
+    category_models/detector_default.pipe > category_models/run.pipe
+```
+
+4. Verify. The diff should show only the detector block replacing the placeholder:
+
+```bash
+diff -u category_models/detector_default.pipe category_models/run.pipe
+```
+
+Regenerate `run.pipe` after every retraining, since `detector.pipe` changes.
+
+## Run inference
+
+```bash
+cd ${TRAINING_DIR}
+mkdir -p ${TRAINING_DIR}/test_output
+python ${VIAME_INSTALL}/configs/process_video.py \
+    -l ${IMAGE_LIST} \
+    -p ${TRAINING_DIR}/category_models/run.pipe \
+    -o ${TRAINING_DIR}/test_output \
+    --no-reset-prompt \
+    -gpus ${GPU_COUNT} \
+    -pipes-per-gpu ${PIPES_PER_GPU}
+```
+
+(This runs inside the container after `source ${VIAME_INSTALL}/setup_viame.sh`, as in your job script.)
