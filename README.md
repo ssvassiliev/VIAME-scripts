@@ -115,14 +115,18 @@ Regenerate `run.pipe` after every retraining, since `detector.pipe` changes.
 
 ```bash
 cd ${TRAINING_DIR}
-mkdir -p ${TRAINING_DIR}/test_output
-python ${VIAME_INSTALL}/configs/process_video.py \
-    -l ${IMAGE_LIST} \
-    -p ${TRAINING_DIR}/category_models/run.pipe \
-    -o ${TRAINING_DIR}/test_output \
-    --no-reset-prompt \
-    -gpus ${GPU_COUNT} \
-    -pipes-per-gpu ${PIPES_PER_GPU}
+mkdir -p ${TRAINING_DIR}/output
+
+apptainer exec --nv ${VIAME_CONTAINER} bash -c "
+    source ${VIAME_INSTALL}/setup_viame.sh
+    python ${VIAME_INSTALL}/configs/process_video.py \
+        -l ${IMAGE_LIST} \
+        -p ${TRAINING_DIR}/category_models/run.pipe \
+        -o ${TRAINING_DIR}/output \
+        --no-reset-prompt \
+        -gpus ${GPU_COUNT} \
+        -pipes-per-gpu ${PIPES_PER_GPU}
+"
 ```
 
 (This runs inside the container after `source ${VIAME_INSTALL}/setup_viame.sh`, as in your job script.)
