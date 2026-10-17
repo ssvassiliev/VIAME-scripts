@@ -44,9 +44,15 @@ Your project directory should have the following structure:
 PPROJECT_DIR/              
 ├── TRAINING_DIR/            
 │   ├── category_models/
+│   │   ├── model_evaluation/
+│   │   ├── detector.pipe
+│   │   ├── detector_default.pipe
+│   │   ├── detector_block.pipe
+│   │   ├── run.pipe
+│   │   └── trained_detector.zip
 │   ├── deep_training/
 │   ├── test_output/
-│   └── IMAGE_LIST
+│   └── IMAGE_LIST 
 └── TRAINING-DATA_DIR       
     ├── dataset_01/
     │   ├── image001.jpg
@@ -146,4 +152,6 @@ apptainer exec --nv ${VIAME_CONTAINER} bash -c "
 ```
 
 (This runs inside the container after `source ${VIAME_INSTALL}/setup_viame.sh`, as in your job script.)
+
+
 
