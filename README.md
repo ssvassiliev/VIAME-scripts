@@ -98,6 +98,8 @@ If you use the filtered list, specify `jpg_images.txt` instead of `inference_ima
 
 ### 3. Generate run pipe
 
+The file category_models/detector.pipe contains the trained-model detector block. We need to take this detector block and put it into the default inference template to generate the complete run pipeline.
+
 Run these from `${TRAINING_DIR}` (the directory that contains `category_models/`).
 
 1. Copy the pipeline template out of the container:
