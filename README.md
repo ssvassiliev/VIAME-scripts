@@ -56,9 +56,6 @@ PPROJECT_DIR/
 │   ├── category_models/
 │   │   ├── model_evaluation/
 │   │   ├── detector.pipe
-│   │   ├── detector_default.pipe
-│   │   ├── detector_block.pipe
-│   │   ├── run.pipe
 │   │   └── trained_detector.zip
 │   ├── deep_training/
 │   ├── test_output/
@@ -95,6 +92,11 @@ grep -i '\.jpg$' /path/to/inference/inference_images.txt \
 ```
 
 If you use the filtered list, specify `jpg_images.txt` instead of `inference_images.txt` when running inference.
+
+
+
+
+
 
 ### 3. Generate run pipe
 
@@ -141,6 +143,31 @@ diff -u category_models/detector_default.pipe category_models/run.pipe
 The diff should show the detector block replacing the [-DETECTOR-IMPL-] placeholder, with the rest of the template unchanged.
 
 **Important:** regenerate `run.pipe` after every retraining, since `detector.pipe` changes.
+
+
+Your project directory after these steps should have the following structure:
+
+```text
+PPROJECT_DIR/              
+├── TRAINING_DIR/            
+│   ├── category_models/
+│   │   ├── model_evaluation/
+│   │   ├── detector.pipe
+│   │   ├── detector_default.pipe
+│   │   ├── detector_block.pipe
+│   │   ├── run.pipe
+│   │   └── trained_detector.zip
+│   ├── deep_training/
+│   ├── test_output/
+│   └── IMAGE_LIST 
+└── TRAINING-DATA_DIR       
+    ├── dataset_01/
+    │   ├── image001.jpg
+    │   ├── image002.jpg
+    │   └── ...
+    ├── dataset_01.csv         
+    └── labels.txt    
+```
 
 ### 5. Run inference
 
