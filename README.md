@@ -1,8 +1,8 @@
-## VIAME Scripts
+# VIAME Scripts
 
-### Training
+## Training
 
-#### 1. Prepare the Training Dataset
+### 1. Prepare the Training Dataset
 
 Create a project directory containing the training images, their annotations, and a label file.
 
@@ -27,17 +27,18 @@ Project-XXX/
 **Important:** Keep the image directory and its annotation CSV file in the same project directory. The CSV filename should match the image directory name, excluding the extension.
 
 
-### Inference
+## Inference
 
+### Describe your environment
 Set the following variables before continuing. They will be referenced throughout the steps below.
 ```
-PROJECT_DIR       # Root directory
+PROJECT_DIR       # Path to the project root directory
 TRAINING_DIR      # Path to the directory containing category_models
 IMAGE_LIST        # Path to inference_images.txt
-VIAME_CONTAINER.  # Path to viame.sif
+VIAME_CONTAINER   # Path to the VIAME container (viame.sif)
 ```
 
-Create a list of images that you want to process with the trained model.
+### Create a list of images that you want to process with the trained model.
 
 **Option 1: Images in a single directory**
 
@@ -73,7 +74,7 @@ grep -i '\.jpg$' /path/to/inference/inference_images.txt \
 
 If you use the filtered list, specify `jpg_images.txt` instead of `inference_images.txt` when running inference.
 
-## Generate run pipe
+### Generate run pipe
 
 Run these from `${TRAINING_DIR}` (the directory that contains `category_models/`).
 
