@@ -64,7 +64,6 @@ PPROJECT_DIR/
 
 ### 2. Create a list of images that you want to process with the trained model.
 
-**Option 1: Images in a single directory**
 
 If all images are in one directory, navigate to that directory and create the list:
 
@@ -73,21 +72,11 @@ cd /path/to/images
 find . -maxdepth 1 -type f > /path/to/inference/inference_images.txt
 ```
 
-Replace `/path/to/images` with the directory containing your images and `/path/to/inference` with your inference working directory.
+Replace `/path/to/images` with the directory containing your images and `/path/to/inference` with your inference working directory `$TRAINING_DIR`.
 
 This command lists all files in the image directory, excluding files in subdirectories.
 
-**Option 2: Images in multiple directories**
-
-If your images are organized into subdirectories, use:
-
-```bash
-find ${PROJECT_DIR} -type f > /path/to/inference/inference_images.txt
-```
-
-Replace `${PROJECT_DIR}` with the path to the directory containing your images. This command lists all files in that directory and its subdirectories.
-
-**Option 3: Filter the list by file extension**
+**Optionally filter the list by file extension**
 
 The commands above include all file types, not just images. If necessary, use `grep` to keep only files with the desired extension. For example, to keep only JPEG images:
 
