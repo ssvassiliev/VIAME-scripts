@@ -142,5 +142,50 @@ apptainer exec --nv ${VIAME_CONTAINER} bash -c "
 
 (This runs inside the container after `source ${VIAME_INSTALL}/setup_viame.sh`, as in your job script.)
 
+### Parallel inference runs 
+(draft, not tested yet)
 
+Each image takes about 1s to process. Rough estimte for 200000 images is 56 hours. We can split whole job in chunks that finish in roughly 1 to 3 hours and run them in parallel. Short jobs schedule faster on Alliance clusters, and a failed chunk costs less to redo. 
 
+Use split to make fixed-size lists, then a Slurm job array so each array task processes one list. That’s one sbatch call and scales to however many chunks you have.
+
+1. Make the lists (from ${TRAINING_DIR}):
+
+```bash
+split -l 5000 -d -a 3 --additional-suffix=.txt all_images.txt lists/chunk_
+ls lists | wc -l
+```
+
+This produces chunk_000.txt, chunk_001.txt, and so on, which means 40 chunks of 5,000 for 200,000 images. split handles filenames with spaces fine because it splits on lines.
+
+2. Run job Array job script (infer_array.sh).
+
+Submit array job script `infer_array.sh` with:
+
+```bash
+mkdir -p output
+sbatch infer_array.sh
+```
+In the script template `--array=0-39` runs tasks 0 to 39.Set the upper bound to the number of chunks minus one: `ls lists | wc -l, minus 1`.
+
+Each chunk writes to its own output directory, so tasks never overwrite each other. 
+
+If you have a differnt numeb of chunks you can pass it at submit time instead of editing the script:
+
+```bash
+sbatch --array=0-$((N-1)) infer_array.sh
+```
+
+4. Rerun failures. Check what finished:
+
+```bash
+sacct -j <jobid> --format=JobID,State,Elapsed,MaxRSS | grep -v COMPLETED
+```
+Then resubmit only the failed indices, for example `sbatch --array=3,17,22 infer_array.sh`.
+
+**Merging**. Once done, you can merge the CSVs. Keep one header and renumber the track IDs, because each chunk restarts IDs from 0. Here’s a sketch, which assumes each chunk wrote computed_detections.csv:
+
+```bash
+head -n 2 output/chunk_000/computed_detections.csv > merged.csv
+for f in output/chunk_*/computed_detections.csv; do grep -v '^#' "$f"; done >> merged.csv
+```  
