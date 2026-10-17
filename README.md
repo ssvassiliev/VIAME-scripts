@@ -6,29 +6,38 @@
 
 Create a project directory containing the training images, their annotations, and a label file.
 
-Example directory structure:
+
+Your project directory should have the following structure:
 
 ```text
-Project-XXX/              
-├── dataset_01/            
-│   ├── image001.jpg
-│   ├── image002.jpg
-│   └── ...
-├── dataset_01.csv         
-└── labels.txt            
+PPROJECT_DIR/              
+├── TRAINING_DIR/            
+└── TRAINING-DATA_DIR       
+    ├── dataset_01/
+    │   ├── image001.jpg
+    │   ├── image002.jpg
+    │   └── ...
+    ├── dataset_01.csv         
+    └── labels.txt    
 ```
 
-**File descriptions:**
-
+**File descriptions:** 
 - `dataset_01/`: Contains the training images.
 - `dataset_01.csv`: Contains the annotations for the images in `dataset_01/`. 
 - `labels.txt`: Lists the object categories used in the annotations.
 
-**Important:** Keep the image directory and its annotation CSV file in the same project directory. The CSV filename should match the image directory name, excluding the extension.
+**Important:** 
+- Keep the image directory and its annotation CSV file in the same project directory. 
+- The CSV filename should match the image directory name, excluding the extension.
 
+### 2. Run training
+
+```bash
+cd ${TRAINING_DIR}
+sbatch /path/to/submit_train.sh
+```
 
 ## Inference
-
 ### 1. Describe your environment
 Set the following variables before continuing. They will be referenced throughout the steps below.
 ```
@@ -39,7 +48,8 @@ VIAME_CONTAINER   # Path to the VIAME container (viame.sif)
 ```
 #### Directory structure
 
-Your project directory should have the following structure:
+Your project directory after training should have the following structure:
+
 ```text
 PPROJECT_DIR/              
 ├── TRAINING_DIR/            
@@ -63,7 +73,6 @@ PPROJECT_DIR/
 ```
 
 ### 2. Create a list of images that you want to process with the trained model.
-
 
 If all images are in one directory, navigate to that directory and create the list:
 
