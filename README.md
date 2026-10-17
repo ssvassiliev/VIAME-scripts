@@ -140,7 +140,7 @@ diff -u category_models/detector_default.pipe category_models/run.pipe
 
 The diff should show the detector block replacing the [-DETECTOR-IMPL-] placeholder, with the rest of the template unchanged.
 
-**Important** Regenerate `run.pipe` after every retraining, since `detector.pipe` changes.
+**Important:** regenerate `run.pipe` after every retraining, since `detector.pipe` changes.
 
 ### 5. Run inference
 
