@@ -39,15 +39,8 @@ sbatch /path/to/submit_train.sh
 
 ## Inference
 ### 1. Describe your environment
-Set the following variables before continuing. They will be referenced throughout the steps below.
-```
-PROJECT_DIR       # Path to the project root directory
-TRAINING_DIR      # Path to the directory containing category_models
-IMAGE_LIST        # Path to inference_images.txt
-VIAME_CONTAINER   # Path to the VIAME container (viame.sif)
-```
-#### Directory structure
 
+#### Directory structure
 Your project directory after training should have the following structure:
 
 ```text
@@ -57,9 +50,7 @@ PPROJECT_DIR/
 │   │   ├── model_evaluation/
 │   │   ├── detector.pipe
 │   │   └── trained_detector.zip
-│   ├── deep_training/
-│   ├── test_output/
-│   └── IMAGE_LIST 
+│   └── deep_training/
 └── TRAINING-DATA_DIR       
     ├── dataset_01/
     │   ├── image001.jpg
@@ -67,6 +58,14 @@ PPROJECT_DIR/
     │   └── ...
     ├── dataset_01.csv         
     └── labels.txt    
+```
+
+Set the following variables before continuing. They will be referenced throughout the steps below.
+```
+PROJECT_DIR       # Path to the project root directory
+TRAINING_DIR      # Path to the directory containing category_models
+IMAGE_LIST        # Path to inference_images.txt
+VIAME_CONTAINER   # Path to the VIAME container (viame.sif)
 ```
 
 ### 2. Create a list of images that you want to process with the trained model.
