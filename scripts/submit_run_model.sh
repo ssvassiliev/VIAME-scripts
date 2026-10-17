@@ -1,29 +1,38 @@
 #!/bin/bash
-#SBATCH -c12 --mem-per-cpu=10000 --gpus-per-node=h100:1 --time=6:0:0
+#SBATCH --cpus-per-task=2
+#SBATCH --mem-per-cpu=4000 
+#SBATCH --gpus=h100_1g.10gb:1
+#SBATCH --time=1:0:0
 
-module load apptainer
+# Project and training location
 
-# Training data location
-export PROJECT_DIR=/project/def-kdavies/Project_VIAME_GSL2025_2026/2022-09-11
-export OUTPUT_DIRECTORY=output
+PROJECT_DIR=/project/6112925/Project_Loutet_Shadowgraph
+export TRAINING_DIR=${PROJECT_DIR}/Training-20260921
+
+export IMAGE_LIST=${TRAINING_DIR}/inference_images_100.txt
 
 # Path to VIAME container
-export VIAME_CONTAINER=/project/def-kdavies/viame.sif
+export VIAME_CONTAINER=${PROJECT_DIR}/viame.sif
 
 # VIAME configuration location inside container
 export VIAME_INSTALL=/opt/noaa/viame
 export GPU_COUNT=1
 export PIPES_PER_GPU=8
 
-cd ${PROJECT_DIR}
+cd ${TRAINING_DIR}
+
+
 # Run VIAME training inside container
+mkdir -p ${TRAINING_DIR}/test_output
+
+module load apptainer
 apptainer exec --nv ${VIAME_CONTAINER} bash -c "
     source ${VIAME_INSTALL}/setup_viame.sh
     python ${VIAME_INSTALL}/configs/process_video.py \
-        -l ${PROJECT_DIR}/input_list.txt \
-        -p ${PROJECT_DIR}/pipelines/detector_project_folder.pipe \
-	-o ${OUTPUT_DIRECTORY} \
-	--no-reset-prompt \
+        -l ${IMAGE_LIST} \
+        -p ${TRAINING_DIR}/category_models/run.pipe \
+        -o ${TRAINING_DIR}/test_output \
+        --no-reset-prompt \
         -gpus ${GPU_COUNT} \
-	-pipes-per-gpu ${PIPES_PER_GPU}
+        -pipes-per-gpu ${PIPES_PER_GPU}
 "
