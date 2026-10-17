@@ -68,18 +68,25 @@ IMAGE_LIST        # Path to inference_images.txt
 VIAME_CONTAINER   # Path to the VIAME container (viame.sif)
 ```
 
+Example:
+
+```bash
+export PROJECT_DIR=/project/6112925/Project_Loutet_Shadowgraph
+export TRAINING_DIR=${PROJECT_DIR}/Training-20260921
+export IMAGE_LIST=${TRAINING_DIR}/inference_images.txt
+export VIAME_CONTAINER=${PROJECT_DIR}/viame.sif
+```
+
 ### 2. Create a list of images that you want to process with the trained model.
 
 If all images are in one directory, navigate to that directory and create the list:
 
 ```bash
 cd /path/to/images
-find . -maxdepth 1 -type f > /path/to/inference/inference_images.txt
+find $(pwd -P) -maxdepth 1 -type f > ${TRAINING_DIR}/inference_images.txt
 ```
 
-Replace `/path/to/images` with the directory containing your images and `/path/to/inference` with your inference working directory `$TRAINING_DIR`.
-
-This command lists all files in the image directory, excluding files in subdirectories.
+This command lists all files in the image directory, excluding files in subdirectories. 
 
 **Optionally filter the list by file extension**
 
@@ -90,11 +97,7 @@ grep -i '\.jpg$' /path/to/inference/inference_images.txt \
     > /path/to/inference/jpg_images.txt
 ```
 
-If you use the filtered list, specify `jpg_images.txt` instead of `inference_images.txt` when running inference.
-
-
-
-
+If you use the filtered list, specify `jpg_images.txt` instead of `inference_images.txt` when running inference. 
 
 
 ### 3. Generate run pipe
@@ -195,22 +198,23 @@ Each image takes about 1s to process. Rough estimte for 200000 images is 56 hour
 
 Use split to make fixed-size lists, then a Slurm job array so each array task processes one list. That’s one sbatch call and scales to however many chunks you have.
 
-1. Make the lists (from ${TRAINING_DIR}):
+1. Make the lists from $IMAGE_LIST:
 
 ```bash
-split -l 5000 -d -a 3 --additional-suffix=.txt all_images.txt lists/chunk_
-ls lists | wc -l
+cd $TRAINING_DIR
+mkdir -p lists
+split -l 5000 -d -a 3 --additional-suffix=.txt inference_images.txt lists/chunk_
 ```
 
 This produces chunk_000.txt, chunk_001.txt, and so on, which means 40 chunks of 5,000 for 200,000 images. split handles filenames with spaces fine because it splits on lines.
 
-2. Run inference using array job script `infer_array.sh`.
+2. Run inference using array job script `submit_infer_array.sh`.
 
-Submit `infer_array.sh` with:
+Submit pipeline with:
 
 ```bash
 mkdir -p output
-sbatch infer_array.sh
+sbatch submit_infer_array.sh
 ```
 
 In the example script `--array=0-39` runs tasks 0 to 39.Set the upper bound to the number of chunks minus one: `ls lists | wc -l, minus 1`.
@@ -223,12 +227,16 @@ If you have a differnt number of chunks you can pass it at submit time instead o
 sbatch --array=0-$((N-1)) infer_array.sh
 ```
 
-4. Rerun failures. Check what finished:
+4. Rerun failures. 
 
+Check what finished:
 ```bash
 sacct -j <jobid> --format=JobID,State,Elapsed,MaxRSS | grep -v COMPLETED
 ```
-Then resubmit only the failed indices, for example `sbatch --array=3,17,22 infer_array.sh`.
+Then resubmit only the failed indices, for example 
+```
+sbatch --array=3,17,22 subnit_infer_array.sh
+```
 
 **Merging**. Once done, you can merge the CSVs. Keep one header and renumber the track IDs, because each chunk restarts IDs from 0. Here’s a sketch, which assumes each chunk wrote computed_detections.csv:
 
