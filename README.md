@@ -98,11 +98,11 @@ If you use the filtered list, specify `jpg_images.txt` instead of `inference_ima
 
 ### 3. Generate run pipe
 
-The file category_models/detector.pipe contains the trained-model detector block. We need to take this detector block and put it into the default inference template to generate the complete run pipeline.
+The file category_models/detector.pipe contains the trained-model detector block. To create a complete inference pipeline, extract this block and insert it into the default inference template.
 
-Run these from `${TRAINING_DIR}` (the directory that contains `category_models/`).
+Run the following commands from `${TRAINING_DIR}` (the directory that contains `category_models/`).
 
-1. Copy the pipeline template out of the container:
+#### 1. Copy the default pipeline template from the container
 
 ```bash
 cd ${TRAINING_DIR}
@@ -111,27 +111,36 @@ apptainer exec ${VIAME_CONTAINER} \
     > category_models/detector_default.pipe
 ```
 
-2. Extract the detector block (everything after `:: image_object_detector` up to the first `connect`):
+#### 2. Extract the trained detector block  
+
+ Extract everything after :: image_object_detector up to the first connect statement:
 
 ```bash
 awk '/:: image_object_detector/{f=1;next} /^connect/{f=0} f' \
     category_models/detector.pipe > category_models/detector_block.txt
 ```
 
-3. Insert the block in place of the `[-DETECTOR-IMPL-]` placeholder:
+#### 3. Insert the detector block into the template.
+
+Replace the [-DETECTOR-IMPL-] placeholder with the extracted detector block to generate the complete inference pipeline, run.pipe:
+
 
 ```bash
 sed -e '/\[-DETECTOR-IMPL-\]/{r category_models/detector_block.txt' -e 'd}' \
     category_models/detector_default.pipe > category_models/run.pipe
 ```
 
-4. Verify. The diff should show only the detector block replacing the placeholder:
+#### 4. Verify the generated pipeline
+
+Compare the original template with the generated pipeline:
 
 ```bash
 diff -u category_models/detector_default.pipe category_models/run.pipe
 ```
 
-Regenerate `run.pipe` after every retraining, since `detector.pipe` changes.
+The diff should show the detector block replacing the [-DETECTOR-IMPL-] placeholder, with the rest of the template unchanged.
+
+**Important** Regenerate `run.pipe` after every retraining, since `detector.pipe` changes.
 
 ### 5. Run inference
 
