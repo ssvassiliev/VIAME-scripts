@@ -167,19 +167,20 @@ ls lists | wc -l
 
 This produces chunk_000.txt, chunk_001.txt, and so on, which means 40 chunks of 5,000 for 200,000 images. split handles filenames with spaces fine because it splits on lines.
 
-2. Run job Array job script (infer_array.sh).
+2. Run inference using array job script `infer_array.sh`.
 
-Submit array job script `infer_array.sh` with:
+Submit `infer_array.sh` with:
 
 ```bash
 mkdir -p output
 sbatch infer_array.sh
 ```
-In the script template `--array=0-39` runs tasks 0 to 39.Set the upper bound to the number of chunks minus one: `ls lists | wc -l, minus 1`.
+
+In the example script `--array=0-39` runs tasks 0 to 39.Set the upper bound to the number of chunks minus one: `ls lists | wc -l, minus 1`.
 
 Each chunk writes to its own output directory, so tasks never overwrite each other. 
 
-If you have a differnt numeb of chunks you can pass it at submit time instead of editing the script:
+If you have a differnt number of chunks you can pass it at submit time instead of editing the script:
 
 ```bash
 sbatch --array=0-$((N-1)) infer_array.sh
