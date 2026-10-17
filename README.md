@@ -29,18 +29,15 @@ Project-XXX/
 
 ### Inference
 
-#### 1. Prepare the Working Directory and Input Image List
-
-Start by creating an empty directory for your inference run. You will store `inference_images.txt` and the inference outputs in this directory.
-
-For example:
-
-```bash
-mkdir inference
-cd inference
+Set the following variables before continuing. They will be referenced throughout the steps below.
+```
+PROJECT_DIR       # Root directory
+TRAINING_DIR      # Path to the directory containing category_models
+IMAGE_LIST        # Path to inference_images.txt
+VIAME_CONTAINER.  # Path to viame.sif
 ```
 
-Next, create a list of images that you want to process with the trained model.
+Create a list of images that you want to process with the trained model.
 
 **Option 1: Images in a single directory**
 
@@ -130,3 +127,19 @@ apptainer exec --nv ${VIAME_CONTAINER} bash -c "
 ```
 
 (This runs inside the container after `source ${VIAME_INSTALL}/setup_viame.sh`, as in your job script.)
+
+```text
+PPROJECT_DIR/              
+├── TRAINING_DIR/            
+│   ├── category_models/
+│   ├── deep_training/
+│   ├─── test_output/
+│   └── IMAGE_LIST
+└── TRAINING-DATA_DIR       
+    ├── dataset_01/
+    │   ├── image001.jpg
+    │   ├── image002.jpg
+    │   └── ...
+    ├── dataset_01.csv         
+    └── labels.txt    
+```
