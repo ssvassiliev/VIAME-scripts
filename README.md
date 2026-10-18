@@ -192,11 +192,14 @@ apptainer exec --nv ${VIAME_CONTAINER} bash -c "
 (This runs inside the container after `source ${VIAME_INSTALL}/setup_viame.sh`, as in your job script.)
 
 ### Parallel inference runs 
-(draft, not tested yet)
 
-Each image takes about 1s to process. Rough estimte for 200000 images is 56 hours. We can split whole job in chunks that finish in roughly 1 to 3 hours and run them in parallel. Short jobs schedule faster on Alliance clusters, and a failed chunk costs less to redo. 
+You can get a quick estimate of the total processing time from the VIAME logs. In this test run, each image takes about 1 second to process, not including I/O, so processing 200,000 images would take more than 56 hours in total. Keep in mind that this is a rough estimate and will likely underestimate the actual runtime.
 
-Use split to make fixed-size lists, then a Slurm job array so each array task processes one list. That’s one sbatch call and scales to however many chunks you have.
+For a more realistic estimate, run a short test job on about 1,000 images and check the job’s wall time. Always run a short test before submitting a large job.
+
+If the estimated runtime is several days, consider splitting the dataset into smaller chunks and submitting them as an array job. Chunks that take roughly 4–10 hours each can run in parallel, and shorter jobs generally start sooner. If a job fails, you’ll also have less work to repeat.
+
+Use split to make fixed-size lists, then a SLURM job array so each array task processes one list. That’s one sbatch call and scales to however many chunks you have.
 
 1. Make the lists from $IMAGE_LIST:
 
@@ -214,20 +217,21 @@ Submit pipeline with:
 
 ```bash
 mkdir -p output
-sbatch submit_infer_array.sh
+sbatch /path/to/submit_infer_array.sh
 ```
 
 In the example script `--array=0-39` runs tasks 0 to 39.Set the upper bound to the number of chunks minus one: `ls lists | wc -l, minus 1`.
 
 Each chunk writes to its own output directory, so tasks never overwrite each other. 
 
-If you have a differnt number of chunks you can pass it at submit time instead of editing the script:
+If you have a different number of chunks you can pass it at submit time instead of editing the script:
 
 ```bash
 sbatch --array=0-$((N-1)) infer_array.sh
 ```
+where N is the number of chunks
 
-4. Rerun failures. 
+3. Rerun failures. 
 
 Check what finished:
 ```bash
@@ -235,7 +239,7 @@ sacct -j <jobid> --format=JobID,State,Elapsed,MaxRSS | grep -v COMPLETED
 ```
 Then resubmit only the failed indices, for example 
 ```
-sbatch --array=3,17,22 subnit_infer_array.sh
+sbatch --array=3,17,22 submit_infer_array.sh
 ```
 
 **Merging**. Once done, you can merge the CSVs. Keep one header and renumber the track IDs, because each chunk restarts IDs from 0. Here’s a sketch, which assumes each chunk wrote computed_detections.csv:
