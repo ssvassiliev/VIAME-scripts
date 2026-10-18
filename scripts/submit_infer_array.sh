@@ -12,8 +12,6 @@
 # Project and training location
 PROJECT_DIR=/project/6112925/Project_Loutet_Shadowgraph
 export TRAINING_DIR=${PROJECT_DIR}/Training-20260921
-# List of images for inference
-export IMAGE_LIST=${TRAINING_DIR}/inference_images.txt
 # Path to the VIAME container
 export VIAME_CONTAINER=${PROJECT_DIR}/viame.sif
 
