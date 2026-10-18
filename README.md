@@ -193,9 +193,20 @@ apptainer exec --nv ${VIAME_CONTAINER} bash -c "
 
 ### Parallel inference runs 
 
-You can get a quick estimate of the total processing time from the VIAME logs. In this test run, each image takes about 1 second to process, not including I/O, so processing 200,000 images would take more than 56 hours in total. Keep in mind that this is a rough estimate and will likely underestimate the actual runtime.
+To estimate the total processing, run a short test job on about 1,000 images and check the job’s wall time. Always run a short test before submitting a large job.
 
-For a more realistic estimate, run a short test job on about 1,000 images and check the job’s wall time. Always run a short test before submitting a large job.
+Benchmark a random sample, not the first N images. Detection density and image content vary through a dive, so a contiguous block can mislead.
+
+```bash
+shuf -n 1000 all_images.txt > inference_images_1000.txt\
+```
+
+Let it finish, then read the time from Slurm: 
+
+```bash
+sacct -X -j <jobid> --format=JobID,State,Elapsed
+```
+Don’t judge progress by CSV line counts in the output file, because empty images write nothing and output may only be complete at the end.
 
 If the estimated runtime is several days, consider splitting the dataset into smaller chunks and submitting them as an array job. Chunks that take roughly 4–10 hours each can run in parallel, and shorter jobs generally start sooner. If a job fails, you’ll also have less work to repeat.
 
