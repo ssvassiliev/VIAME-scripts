@@ -220,6 +220,8 @@ mkdir -p output
 sbatch /path/to/submit_infer_array.sh
 ```
 
+Important: Keep the directory names `lists` and `output` unchanged. These names are hardcoded in the array submission script and must match exactly.
+
 In the example script `--array=0-39` runs tasks 0 to 39.Set the upper bound to the number of chunks minus one: `ls lists | wc -l, minus 1`.
 
 Each chunk writes to its own output directory, so tasks never overwrite each other. 
