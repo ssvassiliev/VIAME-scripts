@@ -198,7 +198,7 @@ To estimate the total processing, run a short test job on about 1,000 images and
 Benchmark a random sample, not the first N images. Detection density and image content vary through a dive, so a contiguous block can mislead.
 
 ```bash
-shuf -n 1000 all_images.txt > inference_images_1000.txt\
+shuf -n 1000 all_images.txt > inference_images_1000.txt
 ```
 
 Let it finish, then read the time from Slurm: 
