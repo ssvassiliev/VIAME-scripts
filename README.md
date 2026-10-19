@@ -191,6 +191,12 @@ apptainer exec --nv ${VIAME_CONTAINER} bash -c "
 
 (This runs inside the container after `source ${VIAME_INSTALL}/setup_viame.sh`, as in your job script.)
 
+Submit pipeline with:
+
+```bash
+sbatch /path/to/submit_infer.sh
+```
+
 ### Parallel inference runs 
 
 To estimate the total processing, run a short test job on about 1,000 images and check the job’s wall time. Always run a short test before submitting a large job.
